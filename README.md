@@ -1,6 +1,6 @@
 # Understanding Privileges and Access Controls in OpenShift
 
-Running containers as root in **Docker** has long been considered to be bad.  Traditionally a running container would be given the same access to the host machine it runs on.  Thus a container built using a priveleged user could be a priveleged user for its hosting system.  This is fine if the container is trusted, but it must be assumed that a hacker could gain control of or run a process within a container thus gaining a beach-head for malicious or nefarious activity.
+Running containers as root in **Docker** has long been considered to be bad.  Traditionally a running container would be given the same access to the host machine it runs on.  Thus a container built using a privileged user could be a privileged user for its hosting system.  This is fine if the container is trusted, but it must be assumed that a hacker could gain control of or run a process within a container thus gaining a beach-head for malicious or nefarious activity.
 
 ## Why Containers Might Require Privilege
 
@@ -10,12 +10,12 @@ Developers strive to produce applications and code that is safe and secure.  One
 - Volume mounting complexities
 - Accessing certain services
 
-An argument could be made against any reason privileged users are used within a container, but many of the arguments come with a cost.  Consider briefy a project such as Istio that has a central tenet of providing an extremely secure method of running microservices within a Kubernetes environment.  A quick Google search will show you a history of arguments and discussions within the community over "why or why not" Istio has containers running as root within its project.  Needless to say its not as easy as just rebuilding a container with a quick configuration change.
+An argument could be made against any reason privileged users are used within a container, but many of the arguments come with a cost.  Consider briefly a project such as Istio that has a central tenet of providing an extremely secure method of running microservices within a Kubernetes environment.  A quick Google search will show you a history of arguments and discussions within the community over "why or why not" Istio has containers running as root within its project.  Needless to say its not as easy as just rebuilding a container with a quick configuration change.
 
 You may notice when starting certain pods that sometimes during the startup you will see **init** containers pop up and then go away.  These containers are by definition short lived and can perform a myriad of special tasks that help more complex workloads start.  
 
 - init containers can perform tasks using utilities that we would not typically want to have included in longer running workloads (these can include secure activities)
-- They can help seperate duties and improve pod / container startup time
+- They can help separate duties and improve pod / container startup time
 - Tasks such as using filesystems and secrets can be performed with different access can thus shelter privilege from application containers
 - init containers can control how the application containers instantiate checking for preconditions and the like and thus orchestrate complex application startup
 
@@ -119,8 +119,8 @@ Settings:
     Ranges:					<none>
 ```
 
-You will notice that although with this policy set the host allows `Privilege Escalation` ie. running as a specific user such as `root` within the container, OpenShift safeguards access to the host by forbidding the pod to access its network, ports, process ID namespace and the host IPC namespace.  Security context constraints should be tailored specifically to workload to provide only specific relaxation of contraint as required by the workload.
+You will notice that although with this policy set the host allows `Privilege Escalation` ie. running as a specific user such as `root` within the container, OpenShift safeguards access to the host by forbidding the pod to access its network, ports, process ID namespace and the host IPC namespace.  Security context constraints should be tailored specifically to workload to provide only specific relaxation of constraint as required by the workload.
 
 ## Summary
 
-OpenShift and Kubernetes provide a thourogh and well thought out method for running workload in a secure manner.  By using security context, security context constraints properly along side projects and service accounts, you can run a variety of workload in a very secure and predictable manner.  It is important to understand security context constraints and develop a standard set of policy and procedures for applying scc when exceptions to `restricted` are required.  Scanning container images for vulnerabilities provides a first line of defense, but falls short of understanding how the container interacts within its pod and the cluster.  By using these tools properly we can safely run workload that has priveleged internal activity.  Not using these tools correctly may unecessarily relax security for workloads that otherwise are compliant.  
+OpenShift and Kubernetes provide a thorough and well thought out method for running workload in a secure manner.  By using security context, security context constraints properly along side projects and service accounts, you can run a variety of workload in a very secure and predictable manner.  It is important to understand security context constraints and develop a standard set of policy and procedures for applying scc when exceptions to `restricted` are required.  Scanning container images for vulnerabilities provides a first line of defense, but falls short of understanding how the container interacts within its pod and the cluster.  By using these tools properly we can safely run workload that has privileged internal activity.  Not using these tools correctly may unnecessarily relax security for workloads that otherwise are compliant.  
