@@ -80,4 +80,47 @@ Settings:
     Ranges:					<none>
 ```
 
-Cluster administrators are able to manage these policies.  The **security context constraint** ensures that nothing can run within the project that does not meet the requirements specified.  Thus, it will stop a developer from unwittingly violating a your policy that may ban containers from running as a privileged user, regardless of how they were built.   
+Cluster administrators are able to manage these policies.  The **security context constraint** ensures that nothing can run within the project that does not meet the requirements specified.  Thus, it will stop a developer from unwittingly violating a your policy that may ban containers from running as a privileged user, regardless of how they were built.  The `anyuid` policy allows running as `root` for instance within the container see below:
+
+```
+Name:						anyuid
+Priority:					10
+Access:
+  Users:					<none>
+  Groups:					system:cluster-admins
+Settings:
+  Allow Privileged:				false
+  Allow Privilege Escalation:			true
+  Default Add Capabilities:			<none>
+  Required Drop Capabilities:			MKNOD
+  Allowed Capabilities:				<none>
+  Allowed Seccomp Profiles:			<none>
+  Allowed Volume Types:				configMap,downwardAPI,emptyDir,persistentVolumeClaim,projected,secret
+  Allowed Flexvolumes:				<all>
+  Allowed Unsafe Sysctls:			<none>
+  Forbidden Sysctls:				<none>
+  Allow Host Network:				false
+  Allow Host Ports:				false
+  Allow Host PID:				false
+  Allow Host IPC:				false
+  Read Only Root Filesystem:			false
+  Run As User Strategy: RunAsAny
+    UID:					<none>
+    UID Range Min:				<none>
+    UID Range Max:				<none>
+  SELinux Context Strategy: MustRunAs
+    User:					<none>
+    Role:					<none>
+    Type:					<none>
+    Level:					<none>
+  FSGroup Strategy: RunAsAny
+    Ranges:					<none>
+  Supplemental Groups Strategy: RunAsAny
+    Ranges:					<none>
+```
+
+You will notice that although with this policy set the host allows `Privilege Escalation` ie. running as a specific user such as `root` within the container, OpenShift safeguards access to the host by forbidding the pod to access its network, ports, process ID namespace and the host IPC namespace.  Security context constraints should be tailored specifically to workload to provide only specific relaxation of contraint as required by the workload.
+
+## Summary
+
+OpenShift and Kubernetes provide a thourogh and well thought out method for running workload in a secure manner.  By using security context, security context constraints properly along side projects and service accounts, you can run a variety of workload in a very secure and predictable manner.  It is important to understand security context constraints and develop a standard set of policy and procedures for applying scc when exceptions to `restricted` are required.  Scanning container images for vulnerabilities provides a first line of defense, but falls short of understanding how the container interacts within its pod and the cluster.  By using these tools properly we can safely run workload that has priveleged internal activity.  Not using these tools correctly may unecessarily relax security for workloads that otherwise are compliant.  
