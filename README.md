@@ -6,7 +6,7 @@ Running containers as root in **Docker** has long been considered to be bad.  Tr
 
 Developers strive to produce applications and code that is safe and secure.  One on the central tenets on the Container Coder's Manifesto (if there were to be such a thing) is "though shall not run containers as root".  There are however reasons why containers may require privileged access internally.  Internally there are some activities restricted to privileged users. Some of these could include:
 
-- Binding ports less than 1024 (remember containers within a pod communicate on a local network)
+- Binding ports less than 1024 (remember containers within a pod communicate on a common local network)
 - Volume mounting complexities
 - Accessing certain services
 
